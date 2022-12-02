@@ -1,5 +1,5 @@
-
 package com.mycompany.practica;
+
 import java.util.*;
 
 public class Practica {
@@ -70,7 +70,63 @@ public class Practica {
             System.out.print(Codigo_final[x]);
         }
         System.out.println("");
+
+        int ResultadoBitWare;
+        int Contador = 0;
+
+        for (int x = 0; x < BitsPariedad; x++) {
+            for (int y = Potencias2[x] + 1; y < Total_bits - Potencias2[x] - 1; y++) {
+                ResultadoBitWare = Potencias2[x] & y;
+                if (ResultadoBitWare == Potencias2[x]) {
+                    if (Codigo_final[y] == 1) {
+                        Contador++;
+                    }
+                }
+            }
+            if (Contador / 2 == 0) {
+                Codigo_final[Potencias2[x]] = 0;
+                Contador = 0;
+            } else {
+                Codigo_final[Potencias2[x]] = 1;
+                Contador = 0;
+            }
+        }
+
+        for (int x = 1; x < Total_bits; x++) {
+            if (Codigo_final[x] == 1) {
+                Contador++;
+            }
+        }
+        if (Contador / 2 == 0) {
+            Codigo_final[0] = 0;
+        } else {
+            Codigo_final[0] = 1;
+        }
+        for (int x = 0; x < Codigo_final.length; x++) {
+            System.out.print(Codigo_final[x]);
+        }
         
+        System.out.println("");
         
+        int Errores = (int) (Math.random() * (2 - 0 + 1) + 0);
+        System.out.println("Numero de errores: " + Errores);
+        int PosRandom;
+        
+        int Codigo_Errores[] = Codigo_final;
+        
+
+        for (int x = 0; x < Errores; x++){
+            PosRandom = (int) (Math.random()* Total_bits);
+            if (Codigo_Errores[PosRandom] == 1){
+                Codigo_Errores[PosRandom] = 0;
+            }
+            else {
+                Codigo_Errores[PosRandom] = 1;
+            }
+        }
+       for (int x = 0; x < Codigo_Errores.length; x++) {
+            System.out.print(Codigo_Errores[x]);
+        }
     }
+
 }
