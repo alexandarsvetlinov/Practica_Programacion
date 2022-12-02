@@ -70,11 +70,11 @@ public class Practica {
         Si el resultado es = a la posicion del bit de pariedad es que lo esta mirando.
         Cuenta la cantidad de 1 que esta mirando es par, pone el bit de pariedad en 0 y resetea el contador,
         si no, lo pone en 1 y resetea el contador
-        */
+         */
         int ResultadoBitWise;
         int Contador = 0;
         for (int x = 0; x < Bits_Pariedad; x++) {
-            for (int y = Potencias2[x] + 1; y < Total_bits - Potencias2[x] - 1; y++) {
+            for (int y = Potencias2[x] + 1; y < Total_bits; y++) {
                 ResultadoBitWise = Potencias2[x] & y;
                 if (ResultadoBitWise == Potencias2[x]) {
                     if (Codigo_Final[y] == 1) {
@@ -82,7 +82,7 @@ public class Practica {
                     }
                 }
             }
-            if (Contador / 2 == 0) {
+            if (Contador % 2 == 0) {
                 Codigo_Final[Potencias2[x]] = 0;
                 Contador = 0;
             } else {
@@ -96,16 +96,20 @@ public class Practica {
                 Contador++;
             }
         }
-        if (Contador / 2 == 0) {
+        if (Contador % 2 == 0) {
             Codigo_Final[0] = 0;
+            Contador = 0;
         } else {
             Codigo_Final[0] = 1;
-        }     
+            Contador = 0;
+        }
         //Imprimo el codigo
         for (int x = 0; x < Codigo_Final.length; x++) {
             System.out.print(Codigo_Final[x]);
         }
         System.out.println("");
+
+        //Parte ERRORES
         //Un math random para calcular el numero de eerores e imprimo cuantos son.
         int Errores = (int) (Math.random() * (2 - 0 + 1) + 0);
         System.out.println("Numero de errores: " + Errores);
@@ -122,9 +126,91 @@ public class Practica {
             }
         }
         //Imprimo el codigo con los erroes
+        System.out.println("Codigo con los errores: ");
         for (int x = 0; x < Codigo_Errores.length; x++) {
             System.out.print(Codigo_Errores[x]);
         }
-    }
+        System.out.println("");
 
+        //Detecta donde esta el error si lo hay, no tecta si el falla esta en el bit global.
+        int Posicion_Error = 0;
+        for (int x = 0; x < Bits_Pariedad; x++) {
+            for (int y = Potencias2[x] + 1; y < Total_bits; y++) {
+                ResultadoBitWise = Potencias2[x] & y;
+                if (ResultadoBitWise == Potencias2[x]) {
+                    if (Codigo_Errores[y] == 1) {
+                        Contador++;
+                    }
+                }
+            }
+            if (Contador % 2 == 0) {
+                if (Codigo_Errores[Potencias2[x]] == 1) {
+                    Posicion_Error = Posicion_Error + Potencias2[x];
+                    Contador = 0;
+                }
+            }
+            if (Contador % 2 == 1) {
+                if (Codigo_Errores[Potencias2[x]] == 0) {
+                    Posicion_Error = Posicion_Error + Potencias2[x];
+                    Contador = 0;
+                }
+            }
+            Contador = 0;
+        }
+        //Calculo el XOR
+        int XOR = 0;
+        for (int i = 0; i < Codigo_Errores.length; i++) {
+            XOR ^= Codigo_Errores[i];
+        }
+
+        //Si el XOR es 0 y si hay un error en alguna posicion detecta que hay un doble error.
+        if ((XOR == 0) && (Posicion_Error != 0)) {
+            System.out.println("Hay un doble error");
+        }
+        //Error en el bit global
+        for (int x = 1; x < Total_bits; x++) {
+            if (Codigo_Final[x] == 1) {
+                Contador++;
+            }
+        }
+        if (XOR != 0 && Posicion_Error == 0) {
+            System.out.println("Se ha detectado un error en el bit global");
+            if (Contador % 2 == 0) {
+                if (Codigo_Errores[0] == 1) {
+                    Codigo_Errores[0] = 0;
+                }
+            }
+            if (Contador % 2 == 1) {
+                if (Codigo_Errores[0] == 0) {
+                    Codigo_Errores[0] = 1;
+                }
+            }
+        }
+        //Un error que esta en cualquier parte del mensaje menos en el bit global.
+        if (XOR != 0 && Posicion_Error != 0) {
+            System.out.println("Se ha detectado un error");
+            System.out.println("Posicion del error: " + Posicion_Error);
+            if (Codigo_Errores[Posicion_Error] == 1) {
+                Codigo_Errores[Posicion_Error] = 0;
+            } else {
+                Codigo_Errores[Posicion_Error] = 1;
+            }
+        }
+        //Cuando no hay errores
+        if (XOR == 0 && Posicion_Error == 0) {
+            System.out.println("No se han detectado errores");
+        }
+        //Imprime que esta corigiendo el codigo si compara con el original y el final si son iguales
+        if ((XOR != 0 && Posicion_Error != 0) || (XOR != 0 && Posicion_Error == 0)) {
+            System.out.println("Corigiendo errores...");
+            System.out.println("Codigo corregido:");
+            for (int x = 0; x < Codigo_Errores.length; x++) {
+                System.out.print(Codigo_Errores[x]);
+            }
+            System.out.println("");
+            if (Codigo_Errores == Codigo_Final) {
+                System.out.println("Se corrigieron correctamente los errores");
+            }
+        }
+    }
 }
